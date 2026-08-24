@@ -145,3 +145,59 @@
     background: color-mix(in oklch, currentColor 30%, transparent);
   }
 }
+
+.leaflet-container {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.haulio-truck-pin {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 6px;
+  box-shadow: 0 3px 10px rgb(23 42 58 / 30%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  transform: rotate(-45deg);
+}
+
+.haulio-truck-pin span {
+  transform: rotate(45deg);
+}
+
+.haulio-map-popup {
+  min-width: 190px;
+  color: #142033;
+  font: 600 12px/1.45 var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.haulio-map-popup strong {
+  display: block;
+  font-size: 13px;
+}
+
+.haulio-map-popup p {
+  margin: 5px 0;
+  color: #65748a;
+}
+
+.haulio-map-popup hr {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.haulio-traffic-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 999px;
+}
+
+.haulio-popup-hint {
+  color: #2563eb !important;
+  font-weight: 800;
+}
