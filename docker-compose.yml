@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Development Service Environment
+  haulio-fe-dev:
+    container_name: haulio-fe-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.development
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  # Staging Service Environment
+  haulio-fe-staging:
+    container_name: haulio-fe-staging
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env.staging
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  # Production Service Environment
+  haulio-fe-prod:
+    container_name: haulio-fe-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  # Backend Upstream service (compfest-aic-2026-be mock service container)
+  # Un-comment this block if running local backend in Docker container
+  # compfest-aic-2026-be:
+  #   container_name: compfest-aic-2026-be
+  #   image: compfest-aic-2026-be:latest
+  #   ports:
+  #     - "8080:8080"
+  #   restart: unless-stopped

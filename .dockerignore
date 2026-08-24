@@ -1,0 +1,32 @@
+# Dependency directories
+node_modules/
+.npm/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+.dockerignore
+docker-compose*.yml
+
+# Environment overrides
+.env*.local
+.env.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Documentation
+README.md
+CLAUDE.md
+AGENTS.md
