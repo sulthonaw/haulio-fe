@@ -29,6 +29,7 @@ export interface Recommendation {
   cargo_summary: string;
   is_multi_hop: boolean;
   capacity_pct: number;
+  expected_empty_location: string;
   eta_final_delivery_min: number;
   distance_km: number;
   expected_margin_idr: number;
