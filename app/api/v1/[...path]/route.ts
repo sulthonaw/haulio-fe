@@ -50,7 +50,7 @@ async function proxy(request: Request, { params }: RouteContext): Promise<Respon
     return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
   } catch {
     return Response.json(
-      { error: "DS/BE service is unavailable. Start compfest-aic-2026-be on port 8080." },
+      { error: "Operations gateway is unavailable. Start haulio-be on port 3001 and the DS service on port 8080." },
       { status: 502, headers: { "cache-control": "no-store" } },
     );
   }
