@@ -22,6 +22,10 @@ const TRAFFIC_COLOR: Record<TrafficLevel, string> = {
   free: "#2563eb",
 };
 
+// Province activity is helpful for a country-level overview, but obscures roads
+// and truck markers once an operator has zoomed into a local operating area.
+const PROVINCE_OVERLAY_MAX_ZOOM = 7;
+
 function activityColor(activity: number): string {
   if (activity >= 0.66) return "#0ea5a8";
   if (activity >= 0.3) return "#7dd3d5";
@@ -108,9 +112,20 @@ export default function Map({
             .openOn(map);
         });
       },
-    }).addTo(map);
+    });
+    const syncProvinceVisibility = () => {
+      const shouldShow = map.getZoom() <= PROVINCE_OVERLAY_MAX_ZOOM;
+      if (shouldShow && !map.hasLayer(layer)) layer.addTo(map);
+      if (!shouldShow && map.hasLayer(layer)) layer.remove();
+    };
+
+    syncProvinceVisibility();
+    map.on("zoomend", syncProvinceVisibility);
     regionsLayerRef.current = layer;
-    return () => { layer.remove(); };
+    return () => {
+      map.off("zoomend", syncProvinceVisibility);
+      layer.remove();
+    };
   }, [regions]);
 
   useEffect(() => {

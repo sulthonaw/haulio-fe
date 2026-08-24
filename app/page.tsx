@@ -79,10 +79,10 @@ export default function AutoHaulUserPage() {
   const isAssigned = data.plan?.status === "accepted";
 
   return (
-    <main className="min-h-dvh bg-slate-100 text-slate-900 sm:flex sm:items-center sm:justify-center sm:p-6">
-      <section className="relative min-h-dvh w-full max-w-md overflow-hidden bg-white shadow-2xl shadow-slate-900/10 sm:min-h-0 sm:rounded-[2rem]">
-        <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500" />
-        <header className="relative flex items-center justify-between px-6 pb-8 pt-7 text-white">
+    <main className="min-h-dvh bg-slate-100 text-slate-900 sm:flex sm:items-center sm:justify-center sm:p-6 lg:p-8">
+      <section className="relative min-h-dvh w-full max-w-md overflow-hidden bg-white shadow-2xl shadow-slate-900/10 sm:min-h-0 sm:rounded-[2rem] lg:min-h-[720px] lg:max-w-6xl">
+        <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 lg:h-72" />
+        <header className="relative flex items-center justify-between px-6 pb-8 pt-7 text-white lg:px-10 lg:pb-12 lg:pt-10">
           <div>
             <div className="flex items-center gap-2">
               <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/20 text-sm font-black">H</span>
@@ -95,8 +95,8 @@ export default function AutoHaulUserPage() {
           </button>
         </header>
 
-        <div className="relative px-5 pb-24">
-          <div className="rounded-2xl bg-white p-5 shadow-xl shadow-blue-950/15">
+        <div className="relative px-5 pb-24 lg:grid lg:grid-cols-2 lg:gap-6 lg:px-10">
+          <div className="rounded-2xl bg-white p-5 shadow-xl shadow-blue-950/15 lg:col-span-2 lg:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-black uppercase tracking-[0.16em] text-blue-600">{isAssigned ? "Your assigned return haul" : "Potential next haul"}</p>
@@ -121,10 +121,10 @@ export default function AutoHaulUserPage() {
             )}
           </div>
 
-          {error && <div className="mt-4 flex gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800"><CircleAlert className="h-4 w-4 shrink-0" />{error}</div>}
+          {error && <div className="mt-4 flex gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 lg:col-span-2 lg:mt-0"><CircleAlert className="h-4 w-4 shrink-0" />{error}</div>}
 
           {data.plan && (
-            <div className="mt-5 rounded-2xl border border-slate-100 bg-white px-4 shadow-sm">
+            <div className="mt-5 rounded-2xl border border-slate-100 bg-white px-4 shadow-sm lg:mt-0">
               <DetailRow icon={PackageCheck} label="Cargo you may haul" value={data.plan.cargo_summary} />
               <div className="border-t border-slate-100" />
               <DetailRow icon={MapPin} label="Pick up" value={pickup?.name ?? data.plan.expected_empty_location} />
@@ -135,7 +135,7 @@ export default function AutoHaulUserPage() {
             </div>
           )}
 
-          <div className="mt-5 rounded-2xl bg-slate-900 p-4 text-white">
+          <div className="mt-5 rounded-2xl bg-slate-900 p-4 text-white lg:mt-0">
             <div className="flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/10"><Truck className="h-5 w-5 text-blue-200" /></span>
               <div className="min-w-0">
@@ -146,13 +146,13 @@ export default function AutoHaulUserPage() {
             {data.truck && <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3 text-[11px] font-semibold text-slate-300"><span>{data.truck.vehicle_type} · {data.truck.capacity_kg.toLocaleString("id-ID")} kg</span><span>{Math.round(data.truck.fuel_pct)}% fuel</span></div>}
           </div>
 
-          <div className="mt-5 flex gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+          <div className="mt-5 flex gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 lg:col-span-2 lg:mt-0">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
             <p className="text-xs leading-relaxed text-slate-600"><b className="text-slate-800">No load selection required.</b> Auto Haul matches cargo, route, timing, and vehicle capacity for you.</p>
           </div>
         </div>
 
-        <nav className="fixed inset-x-0 bottom-0 z-10 mx-auto flex w-full max-w-md items-center justify-around border-t border-slate-100 bg-white px-5 py-3 text-[10px] font-bold text-slate-400 shadow-[0_-6px_20px_rgba(15,23,42,0.06)] sm:rounded-b-[2rem]">
+        <nav className="fixed inset-x-0 bottom-0 z-10 mx-auto flex w-full max-w-md items-center justify-around border-t border-slate-100 bg-white px-5 py-3 text-[10px] font-bold text-slate-400 shadow-[0_-6px_20px_rgba(15,23,42,0.06)] sm:rounded-b-[2rem] lg:max-w-6xl">
           <span className="flex flex-col items-center gap-1 text-blue-600"><Truck className="h-4 w-4" />Auto Haul</span>
           <span className="flex flex-col items-center gap-1"><Route className="h-4 w-4" />My trip</span>
           <span className="flex flex-col items-center gap-1"><Bell className="h-4 w-4" />Updates</span>
