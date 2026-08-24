@@ -46,6 +46,19 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  
+  /* Custom overrides for blue palette to match corporate base color #041E41 */
+  --color-blue-50: #e6edf7;
+  --color-blue-100: #ccdbe8;
+  --color-blue-200: #99b7d1;
+  --color-blue-300: #6692bb;
+  --color-blue-400: #336ea4;
+  --color-blue-500: #05498c;
+  --color-blue-600: #041E41;
+  --color-blue-700: #031732;
+  --color-blue-800: #021126;
+  --color-blue-900: #010a17;
+  --color-blue-950: #00050d;
 }
 
 :root {
@@ -55,8 +68,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #041E41;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -90,8 +103,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #336ea4;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);

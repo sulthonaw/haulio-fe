@@ -6,19 +6,24 @@ import { ArrowLeftIcon, CpuChipIcon } from "@heroicons/react/24/outline";
 import EmptyHaulEngine from "./_sections/empty-haul-engine";
 import BackhaulMatcher from "./_sections/backhaul-matcher";
 import ActivityLogs from "./_sections/activity-logs";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   return (
     <main className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-50">
 
       {/* Dashboard Top Header */}
-      <header className="sticky top-0 z-30 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md px-6 py-4 flex items-center justify-between shadow-sm">
+      <header className="sticky top-0 z-30 w-full border-b border-[#031732] bg-[#041E41] px-6 py-4 flex items-center justify-between shadow-md text-white">
 
         {/* Logo and title */}
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="inline-flex items-center justify-center p-2 rounded-lg bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-850 text-zinc-650 dark:text-zinc-300 transition-colors mr-1 cursor-pointer"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              "h-8 w-8 bg-white/10 hover:bg-white/20 border border-white/10 text-white cursor-pointer"
+            )}
           >
             <ArrowLeftIcon className="h-4 w-4" />
           </Link>
@@ -27,11 +32,11 @@ export default function Dashboard() {
             alt="Haulio Logo"
             width={112}
             height={28}
-            className="h-7 w-auto object-contain brightness-0 dark:brightness-100"
+            className="h-7 w-auto object-contain"
           />
-          <div className="border-l border-zinc-200 dark:border-zinc-850 pl-3 ml-1 hidden sm:block">
-            <h1 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400 leading-none flex items-center gap-1">
-              <CpuChipIcon className="h-3.5 w-3.5 text-zinc-500" />
+          <div className="border-l border-white/20 pl-3 ml-1 hidden sm:block">
+            <h1 className="text-xs font-black uppercase tracking-wider text-slate-300 leading-none flex items-center gap-1">
+              <CpuChipIcon className="h-3.5 w-3.5 text-slate-350" />
               AI Intelligence
             </h1>
           </div>

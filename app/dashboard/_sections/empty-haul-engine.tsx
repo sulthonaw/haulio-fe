@@ -1,6 +1,10 @@
 "use client";
 
 import { ExclamationTriangleIcon, CpuChipIcon, ShieldExclamationIcon } from "@heroicons/react/24/outline";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 export default function EmptyHaulEngine() {
   const riskScore = 74;
@@ -19,72 +23,78 @@ export default function EmptyHaulEngine() {
   ];
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl p-5 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-5">
-
+    <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm overflow-visible">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <CardHeader className="p-5 pb-0 flex flex-row items-start justify-between space-y-0">
         <div className="space-y-1">
-          <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5">
+          <CardTitle className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-1.5 font-heading">
             <CpuChipIcon className="h-4.5 w-4.5 text-zinc-500" />
             Empty Haul Risk
-          </h2>
-          <p className="text-[11px] text-zinc-500">Probability of returning without cargo</p>
+          </CardTitle>
+          <CardDescription className="text-[11px] text-zinc-500">
+            Probability of returning without cargo
+          </CardDescription>
         </div>
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${route.riskColor}`}>
+        <Badge
+          variant="outline"
+          className={cn(
+            "inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border",
+            route.riskColor
+          )}
+        >
           <ExclamationTriangleIcon className="h-3 w-3" />
           {route.riskLevel}
-        </span>
-      </div>
+        </Badge>
+      </CardHeader>
 
       {/* Main Stats (Gauge and stats) */}
-      <div className="space-y-4">
-
-        {/* Simple Flat Metric Bar */}
-        <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-150 dark:border-zinc-850">
-          <div className="flex justify-between items-end mb-2">
-            <span className="text-xs font-semibold text-zinc-500">Risk Assessment</span>
-            <span className="text-2xl font-black text-zinc-950 dark:text-white leading-none">{riskScore}%</span>
-          </div>
-          <div className="w-full bg-zinc-250 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-amber-500 rounded-full transition-all duration-1000"
-              style={{ width: `${riskScore}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Route Details */}
-        <div className="space-y-1.5 text-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Route Corridor</span>
-          <p className="font-bold text-zinc-800 dark:text-zinc-200">
-            {route.origin} &rarr; {route.destination}
-          </p>
-        </div>
-
-        {/* Warning Indicator */}
-        <div className="flex gap-2 bg-amber-50/50 dark:bg-amber-950/10 p-3 border border-amber-100 dark:border-amber-900/30 rounded-lg">
-          <ShieldExclamationIcon className="h-4.5 w-4.5 text-amber-600 dark:text-amber-500 shrink-0" />
-          <p className="text-[11px] text-amber-800 dark:text-amber-400 leading-normal">
-            Surabaya outbound dispatch is down 32% to West Java. Availability of loaded cargo is highly congested.
-          </p>
-        </div>
-
-      </div>
-
-      {/* Feature Importance Section */}
-      <div className="space-y-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Key Risk Drivers</span>
-
-        <div className="space-y-2">
-          {featureImportance.map((feature, idx) => (
-            <div key={idx} className="flex justify-between text-xs items-center">
-              <span className="text-zinc-650 dark:text-zinc-350">{feature.name}</span>
-              <span className="text-zinc-900 dark:text-zinc-150 font-bold">{feature.value}%</span>
+      <CardContent className="p-5 pt-4 space-y-5">
+        <div className="space-y-4">
+          {/* Simple Flat Metric Bar */}
+          <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-150 dark:border-zinc-850">
+            <div className="flex justify-between items-end mb-2">
+              <span className="text-xs font-semibold text-zinc-500">Risk Assessment</span>
+              <span className="text-2xl font-black text-zinc-950 dark:text-white leading-none">{riskScore}%</span>
             </div>
-          ))}
-        </div>
-      </div>
+            <div className="w-full bg-zinc-250 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-amber-500 rounded-full transition-all duration-1000"
+                style={{ width: `${riskScore}%` }}
+              />
+            </div>
+          </div>
 
-    </div>
+          {/* Route Details */}
+          <div className="space-y-1.5 text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Route Corridor</span>
+            <p className="font-bold text-zinc-800 dark:text-zinc-200">
+              {route.origin} &rarr; {route.destination}
+            </p>
+          </div>
+
+          {/* Warning Indicator */}
+          <Alert className="flex gap-2 bg-amber-50/50 dark:bg-amber-950/10 p-3 border border-amber-100 dark:border-amber-900/30 rounded-lg">
+            <ShieldExclamationIcon className="h-4.5 w-4.5 text-amber-600 dark:text-amber-500 shrink-0" />
+            <AlertDescription className="text-[11px] text-amber-800 dark:text-amber-400 leading-normal font-sans">
+              Surabaya outbound dispatch is down 32% to West Java. Availability of loaded cargo is highly congested.
+            </AlertDescription>
+          </Alert>
+        </div>
+
+        {/* Feature Importance Section */}
+        <div className="space-y-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Key Risk Drivers</span>
+
+          <div className="space-y-2">
+            {featureImportance.map((feature, idx) => (
+              <div key={idx} className="flex justify-between text-xs items-center">
+                <span className="text-zinc-650 dark:text-zinc-350">{feature.name}</span>
+                <span className="text-zinc-900 dark:text-zinc-150 font-bold">{feature.value}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

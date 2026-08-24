@@ -3,9 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 import { Activity, Check, ChevronRight, CircleAlert, Container, MapPinned, Menu, RefreshCw, Truck, X } from "lucide-react";
 import type { GoogleTrafficResult, Metrics, Recommendation, Regions, RouteOption, RouteOptions, TrafficLevel, Truck as TruckData } from "@/lib/operations";
 import { minutes, rupiah } from "@/lib/operations";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const OperationsMap = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -157,27 +163,69 @@ export default function Home() {
       <OperationsMap regions={regions} fleet={fleet} recommendations={recommendations} selectedPlan={selectedPlan} routeOptions={routeOptions} focusRegion={focusRegion} onPlanSelect={inspectPlan} onRouteSelect={chooseRoute} />
 
       <header className="pointer-events-none fixed left-4 right-4 top-4 z-[1000] flex items-center gap-3">
-        <button type="button" onClick={() => setLeftOpen((current) => !current)} aria-label="Open operations list" aria-expanded={leftOpen} className="pointer-events-auto grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-md shadow-slate-900/10 transition hover:bg-slate-50"><Menu className="h-5 w-5" /></button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setLeftOpen((current) => !current)}
+          aria-label="Open operations list"
+          aria-expanded={leftOpen}
+          className="pointer-events-auto grid h-11 w-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-md shadow-slate-900/10 hover:bg-slate-50 cursor-pointer"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
         <div className="pointer-events-auto flex items-center gap-2 rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-md shadow-slate-900/10 backdrop-blur">
-          <div className="grid h-7 w-7 place-items-center rounded-lg bg-blue-600 text-xs font-black text-white">H</div>
-          <div><h1 className="text-sm font-extrabold tracking-tight">Haulio Control Center</h1><p className="text-[10px] font-semibold text-slate-500">Indonesia backhaul operations</p></div>
+          <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#041E41] p-1 shrink-0">
+            <Image
+              src="/logo-white.png"
+              alt="Haulio Logo"
+              width={24}
+              height={24}
+              className="h-auto w-full object-contain"
+            />
+          </div>
+          <div><h1 className="text-sm font-extrabold tracking-tight leading-none">Haulio Control Center</h1><p className="text-[10px] font-semibold text-slate-500 mt-0.5">Indonesia backhaul operations</p></div>
         </div>
         <div className="flex-1" />
-        <Link href="/" className="pointer-events-auto hidden rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50 sm:block">Driver view</Link>
-        <Link href="/dashboard" className="pointer-events-auto hidden rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50 sm:block">AI dashboard</Link>
+        <Link href="/" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-auto hidden sm:inline-flex bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm")}>Driver view</Link>
+        <Link href="/dashboard" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "pointer-events-auto hidden sm:inline-flex bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm")}>AI dashboard</Link>
         <span className="hidden rounded-full border border-slate-200 bg-white/95 px-3 py-2 text-[11px] font-bold text-slate-500 shadow-sm backdrop-blur sm:block">{routeOptions?.route_source ?? "Indonesia activity map"}</span>
-        <button type="button" onClick={() => void runSimulation()} className="pointer-events-auto hidden items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white shadow-md transition hover:bg-blue-700 sm:flex"><Activity className="h-3.5 w-3.5" /> Simulate telemetry</button>
-        <button type="button" onClick={() => void refresh()} aria-label="Refresh dashboard" className="pointer-events-auto grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-md transition hover:bg-slate-50"><RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} /></button>
+        <Button
+          onClick={() => void runSimulation()}
+          className="pointer-events-auto hidden items-center gap-1.5 rounded-lg bg-blue-600 px-3 h-9 text-xs font-bold text-white shadow-md hover:bg-blue-700 sm:flex cursor-pointer"
+        >
+          <Activity className="h-3.5 w-3.5" /> Simulate telemetry
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => void refresh()}
+          aria-label="Refresh dashboard"
+          className="pointer-events-auto grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-md hover:bg-slate-50 cursor-pointer"
+        >
+          <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+        </Button>
       </header>
 
       <aside className={`fixed bottom-0 left-0 top-0 z-[1100] w-[min(390px,calc(100vw-24px))] overflow-y-auto border-r border-slate-200 bg-white shadow-2xl shadow-slate-900/20 transition-transform duration-200 ${leftOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-start justify-between border-b border-slate-100 px-5 pb-4 pt-6">
           <div><p className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">Dispatcher view</p><h2 className="mt-1 text-lg font-extrabold tracking-tight">Operations list</h2></div>
-          <button type="button" onClick={() => setLeftOpen(false)} aria-label="Close operations list" className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"><X className="h-4 w-4" /></button>
+          <Button variant="outline" size="icon" onClick={() => setLeftOpen(false)} aria-label="Close operations list" className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 cursor-pointer"><X className="h-4 w-4" /></Button>
         </div>
         <div className="grid grid-cols-3 gap-2 px-4 py-4"><Metric label="Fleet" value={metrics?.fleet_total ?? "—"} /><Metric label="At risk" value={metrics?.fleet_at_empty_risk ?? "—"} /><Metric label="Open cargo" value={metrics?.open_orders ?? "—"} /></div>
         <div className="mx-4 grid grid-cols-3 rounded-lg bg-slate-100 p-1">
-          {([["fleet", "Fleet", Truck], ["cargo", "Cargo", Container], ["regions", "Regions", MapPinned]] as const).map(([tab, label, Icon]) => <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`flex items-center justify-center gap-1 rounded-md px-1 py-2 text-[11px] font-bold transition ${activeTab === tab ? "bg-white text-blue-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}><Icon className="h-3.5 w-3.5" /> {label}</button>)}
+          {([["fleet", "Fleet", Truck], ["cargo", "Cargo", Container], ["regions", "Regions", MapPinned]] as const).map(([tab, label, Icon]) => (
+            <Button
+              key={tab}
+              variant="ghost"
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "flex items-center justify-center gap-1 rounded-md px-1 py-2 text-[11px] font-bold transition h-8 cursor-pointer border-0",
+                activeTab === tab ? "bg-white text-blue-700 shadow-sm hover:bg-white hover:text-blue-700" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              <Icon className="h-3.5 w-3.5" /> {label}
+            </Button>
+          ))}
         </div>
 
         <div className="px-3 pb-6 pt-3">
@@ -202,17 +250,31 @@ export default function Home() {
         <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-600">{selectedPlan.status === "accepted" ? "Dispatcher-approved plan" : "Recommended backhaul"}</p><h2 className="mt-1 text-sm font-extrabold leading-snug">{selectedPlan.cargo_summary}</h2>
         <p className="mt-1 text-[11px] text-slate-500">{selectedPlan.truck_name} · {selectedRoute?.distance_km ?? selectedPlan.distance_km} km {selectedRoute && <><span className="px-1">·</span><TrafficBadge level={selectedRoute.traffic.level} /></>}</p>
         <div className="mt-3 grid grid-cols-3 gap-2"><Metric label="P50 ETA" value={selectedRoute ? minutes(selectedRoute.eta_p50_min) : minutes(selectedPlan.eta_final_delivery_min)} /><Metric label="Margin" value={rupiah(selectedPlan.expected_margin_idr)} /><Metric label="Routes" value={routeOptions?.routes.length ?? "…"} /></div>
-        <div className="mt-3 flex justify-end gap-2">{selectedPlan.status === "proposed" && <button type="button" onClick={() => void decide("reject")} className="rounded-lg border border-slate-200 px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50">Reject</button>}{selectedPlan.status === "proposed" && <button type="button" onClick={() => void decide("accept")} className="rounded-lg bg-blue-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-blue-700"><Check className="mr-1 inline h-3.5 w-3.5" />Accept</button>}<button type="button" onClick={() => setRightOpen(true)} className="rounded-lg border border-slate-200 px-3 py-2 text-[11px] font-bold text-slate-700 hover:bg-slate-50">Show more</button></div>
+        <div className="mt-3 flex justify-end gap-2">
+          {selectedPlan.status === "proposed" && (
+            <Button variant="outline" size="sm" onClick={() => void decide("reject")} className="rounded-lg border border-slate-200 px-3 h-8 text-[11px] font-bold text-slate-600 hover:bg-slate-50 cursor-pointer">
+              Reject
+            </Button>
+          )}
+          {selectedPlan.status === "proposed" && (
+            <Button size="sm" onClick={() => void decide("accept")} className="rounded-lg bg-blue-600 px-3 h-8 text-[11px] font-bold text-white hover:bg-blue-700 cursor-pointer">
+              <Check className="mr-1 inline h-3.5 w-3.5" />Accept
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setRightOpen(true)} className="rounded-lg border border-slate-200 px-3 h-8 text-[11px] font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
+            Show more
+          </Button>
+        </div>
       </section>}
 
       <aside className={`fixed bottom-0 right-0 top-0 z-[1100] w-[min(410px,calc(100vw-24px))] overflow-y-auto border-l border-slate-200 bg-white shadow-2xl shadow-slate-900/20 transition-transform duration-200 ${rightOpen ? "translate-x-0" : "translate-x-full"}`}>
-        <div className="flex items-start justify-between border-b border-slate-100 px-5 pb-4 pt-6"><div><p className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">Route intelligence</p><h2 className="mt-1 text-lg font-extrabold tracking-tight">{selectedPlan?.truck_name ?? "No route selected"}</h2></div><button type="button" onClick={() => setRightOpen(false)} aria-label="Close route detail" className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"><X className="h-4 w-4" /></button></div>
+        <div className="flex items-start justify-between border-b border-slate-100 px-5 pb-4 pt-6"><div><p className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">Route intelligence</p><h2 className="mt-1 text-lg font-extrabold tracking-tight">{selectedPlan?.truck_name ?? "No route selected"}</h2></div><Button variant="outline" size="icon" onClick={() => setRightOpen(false)} aria-label="Close route detail" className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 cursor-pointer"><X className="h-4 w-4" /></Button></div>
         <div className="space-y-5 p-5">
           {!selectedPlan || !routeOptions ? <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-slate-600"><strong className="block text-slate-900">No route selected</strong><span className="mt-1 block text-xs">Select a truck or cargo plan from the operations list.</span></div> : <>
             <div className="rounded-xl border border-blue-100 bg-blue-50 p-4"><strong className="block text-sm">{selectedPlan.cargo_summary}</strong><span className="mt-1 block text-xs text-slate-500">{routeOptions.route_source}</span></div>
             <div><h3 className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Road-route options</h3><div className="space-y-2">{routeOptions.routes.map((route) => <button key={route.id} type="button" onClick={() => setSelectedRouteId(route.id)} className={`w-full rounded-xl border p-3 text-left transition ${route.rank === 1 ? "border-blue-200 bg-blue-50/70" : "border-slate-200 bg-slate-50 opacity-80 hover:opacity-100"} ${selectedRouteId === route.id ? "ring-2 ring-blue-100" : ""}`}><span className="flex items-start justify-between gap-2"><strong className="text-xs">{route.label}</strong><TrafficBadge level={route.traffic.level} /></span><span className="mt-1.5 block text-[11px] leading-relaxed text-slate-500">{route.traffic.source}</span><span className="mt-2 flex gap-3 text-[11px] font-bold text-slate-700"><span>{route.distance_km} km</span><span>P50 {minutes(route.eta_p50_min)}</span><span>P90 {minutes(route.eta_p90_min)}</span></span></button>)}</div><p className="mt-2 text-[10px] leading-relaxed text-slate-400">{routeOptions.traffic_disclaimer}</p></div>
             <div><h3 className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Economics & confidence</h3><div className="grid grid-cols-2 gap-2"><Metric label="Expected margin" value={rupiah(selectedPlan.expected_margin_idr)} /><Metric label="Minimum quote" value={rupiah(selectedPlan.minimum_viable_quote_idr)} /><Metric label="Capacity" value={`${selectedPlan.capacity_pct}%`} /><Metric label="Confidence" value={`${Math.round(selectedPlan.confidence * 100)}%`} /></div></div>
-            <div><h3 className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Google live traffic</h3><button type="button" disabled={checkingTraffic} onClick={() => void checkGoogleTraffic()} className="w-full rounded-lg bg-blue-600 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60">{checkingTraffic ? "Checking Google traffic…" : "Check Google live traffic"}</button><p className={`mt-2 rounded-lg p-3 text-[11px] leading-relaxed ${trafficResult?.error ? "bg-red-50 text-red-700" : "bg-slate-50 text-slate-500"}`}>{trafficResult?.available && trafficResult.live_eta_min !== undefined ? `${trafficResult.provider}: live ETA ${minutes(trafficResult.live_eta_min)}; baseline ${minutes(trafficResult.static_eta_min ?? 0)}; ${trafficResult.traffic_delay_min ?? 0} minute(s) traffic delay. ${trafficResult.notice ?? ""}` : trafficResult?.error ?? "On-demand dispatcher confirmation only. Google traffic is not retained for model training."}</p></div>
+            <div><h3 className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Google live traffic</h3><Button disabled={checkingTraffic} onClick={() => void checkGoogleTraffic()} className="w-full rounded-lg bg-blue-600 px-3 h-9 text-xs font-bold text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60 cursor-pointer">{checkingTraffic ? "Checking Google traffic…" : "Check Google live traffic"}</Button><p className={`mt-2 rounded-lg p-3 text-[11px] leading-relaxed ${trafficResult?.error ? "bg-red-50 text-red-700" : "bg-slate-50 text-slate-500"}`}>{trafficResult?.available && trafficResult.live_eta_min !== undefined ? `${trafficResult.provider}: live ETA ${minutes(trafficResult.live_eta_min)}; baseline ${minutes(trafficResult.static_eta_min ?? 0)}; ${trafficResult.traffic_delay_min ?? 0} minute(s) traffic delay. ${trafficResult.notice ?? ""}` : trafficResult?.error ?? "On-demand dispatcher confirmation only. Google traffic is not retained for model training."}</p></div>
             <div><h3 className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Stops</h3><div className="space-y-2">{routeOptions.stops.map((stop) => <div key={`${stop.kind}-${stop.name}`} className="border-l-4 border-blue-600 bg-slate-50 px-3 py-2"><strong className="block text-[10px] uppercase tracking-wider text-blue-700">{stop.kind.replaceAll("_", " ")}</strong><span className="mt-0.5 block text-xs text-slate-600">{stop.name}{stop.cargo ? ` · ${stop.cargo}` : ""}</span></div>)}</div></div>
             <div><h3 className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Why this match</h3><ul className="space-y-1.5">{selectedPlan.explanation.map((reason) => <li key={reason} className="flex gap-2 text-xs leading-relaxed text-slate-600"><ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />{reason}</li>)}</ul></div>
           </>}
