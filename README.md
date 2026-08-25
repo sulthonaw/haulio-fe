@@ -8,6 +8,14 @@ Follow these instructions to configure and run the application locally or via Do
 
 ---
 
+## Related repositories
+
+- DS: https://github.com/ElFariss/compfest-aic-2026-ds
+- FE: https://github.com/sulthonaw/haulio-fe
+- BE: https://github.com/sulthonaw/haulio-be
+
+---
+
 ## ⚙️ Environment Configuration
 
 The application communicates with the backend operations service via the `BACKEND_URL` environment variable. Ensure the correct environment configurations are set before running:
