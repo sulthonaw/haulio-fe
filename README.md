@@ -75,10 +75,18 @@ curl --fail http://127.0.0.1:3001/api/v1/health
 curl --fail http://127.0.0.1:3000/
 ```
 
-The teammate's DS release intentionally exposes immutable `/infer/*` policy
-endpoints, while the map UI still expects the earlier operations-map contract
-(`/fleet`, `/regions`, `/recommendations`). All three containers run together,
-but adapting that map contract to the new real-policy API is a separate product
-integration; this Compose setup does not fabricate a fleet response.
+The DS deliberately exposes immutable `/infer/*` policy endpoints. For the
+local demo, the backend serves the operations-map contract (`/fleet`,
+`/regions`, `/recommendations`) from persisted PostgreSQL truck state and
+telemetry. Its traffic colours are a labelled local telemetry heuristic; live
+Google traffic remains an on-demand dispatcher confirmation, not training data.
+
+To populate the local demo with 300 trucks and three recent telemetry events
+per truck, run this after the backend Compose service is up:
+
+```bash
+cd ../haulio-be
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U postgres -d haulio_demo < scripts/seed-demo-data.sql
+```
 
 To stop a component, run `docker compose down` from that component's repository.

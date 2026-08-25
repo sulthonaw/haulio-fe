@@ -8,7 +8,9 @@ services:
       NODE_ENV: production
       BACKEND_URL: http://be:3001
     ports:
-      - "127.0.0.1:3000:3000"
+      # The dashboard is intentionally reachable from the local IPv4 network.
+      # BE and DS remain internal/loopback-only.
+      - "0.0.0.0:3000:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 10s

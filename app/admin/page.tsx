@@ -116,13 +116,14 @@ export default function Home() {
 
   const runSimulation = useCallback(async () => {
     try {
-      const result = await api<{ events: Array<{ accepted?: boolean }> }>("/simulation/tick", { method: "POST", body: "{}" });
-      setNotice(`${result.events.filter((event) => event.accepted).length} signed truck updates accepted.`);
+      const result = await api<{ events: Array<{ accepted?: boolean }>; highlight_plan_id?: string | null }>("/simulation/tick", { method: "POST", body: "{}" });
       await refresh();
+      if (result.highlight_plan_id) await selectPlan(result.highlight_plan_id);
+      setNotice(`${result.events.filter((event) => event.accepted).length} trucks advanced. Showing a simulated live-traffic route.`);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Simulation update failed.");
     }
-  }, [refresh]);
+  }, [refresh, selectPlan]);
 
   const decide = useCallback(async (action: "accept" | "reject") => {
     if (!selectedPlanId) return;
@@ -193,7 +194,7 @@ export default function Home() {
           onClick={() => void runSimulation()}
           className="pointer-events-auto hidden items-center gap-1.5 rounded-lg bg-blue-600 px-3 h-9 text-xs font-bold text-white shadow-md hover:bg-blue-700 sm:flex cursor-pointer"
         >
-          <Activity className="h-3.5 w-3.5" /> Simulate telemetry
+          <Activity className="h-3.5 w-3.5" /> Simulate live traffic
         </Button>
         <Button
           variant="outline"
@@ -229,7 +230,7 @@ export default function Home() {
         </div>
 
         <div className="px-3 pb-6 pt-3">
-          {activeTab === "fleet" && <><p className="px-2 pb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Verified truck graphs</p>{fleet.map((truck) => {
+          {activeTab === "fleet" && <><p className="px-2 pb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Telemetry-backed truck positions</p>{fleet.map((truck) => {
             const plan = recommendations.find((item) => item.truck_id === truck.id);
             return <button key={truck.id} type="button" disabled={!plan} onClick={() => plan && inspectPlan(plan.id)} className={`mb-1.5 w-full rounded-lg border p-3 text-left transition ${plan?.id === selectedPlanId ? "border-blue-200 bg-blue-50" : "border-transparent hover:border-slate-200 hover:bg-slate-50"} disabled:cursor-default disabled:hover:border-transparent disabled:hover:bg-transparent`}>
               <span className="flex items-start justify-between gap-3"><strong className="text-xs">{truck.name}</strong><TrafficBadge level={truck.traffic.level} /></span>
@@ -237,13 +238,13 @@ export default function Home() {
             </button>;
           })}</>}
           {activeTab === "cargo" && <><p className="px-2 pb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Ranked backhaul plans</p>{recommendations.map((plan) => <button key={plan.id} type="button" onClick={() => inspectPlan(plan.id)} className={`mb-1.5 w-full rounded-lg border p-3 text-left transition ${plan.id === selectedPlanId ? "border-blue-200 bg-blue-50" : "border-transparent hover:border-slate-200 hover:bg-slate-50"}`}><span className="flex items-start justify-between gap-2"><strong className="text-xs leading-snug">{plan.is_multi_hop ? "Multi-hop · " : ""}{plan.cargo_summary}</strong><b className="whitespace-nowrap text-[11px] text-blue-700">{rupiah(plan.expected_margin_idr)}</b></span><span className="mt-1.5 block text-[11px] text-slate-500">{plan.truck_name} · {plan.distance_km} km · {minutes(plan.eta_final_delivery_min)} ETA</span></button>)}</>}
-          {activeTab === "regions" && <><p className="px-2 pb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Province activity</p>{[...(regions?.features ?? [])].sort((a, b) => b.properties.activity - a.properties.activity).map((region) => <button key={region.properties.name} type="button" onClick={() => setFocusRegion(region.properties.name)} className="mb-1.5 w-full rounded-lg border border-transparent p-3 text-left transition hover:border-slate-200 hover:bg-slate-50"><span className="flex items-start justify-between gap-2"><strong className="text-xs">{region.properties.name}</strong><b className="text-[11px] text-blue-700">{region.properties.truck_count} truck(s)</b></span><span className="mt-1.5 block text-[11px] text-slate-500">{region.properties.log_count} accepted logs · {region.properties.traffic.jammed} jammed / {region.properties.traffic.slow} moderate / {region.properties.traffic.free} free</span></button>)}</>}
+          {activeTab === "regions" && <><p className="px-2 pb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Operating-area activity</p>{[...(regions?.features ?? [])].sort((a, b) => b.properties.activity - a.properties.activity).map((region) => <button key={region.properties.name} type="button" onClick={() => setFocusRegion(region.properties.name)} className="mb-1.5 w-full rounded-lg border border-transparent p-3 text-left transition hover:border-slate-200 hover:bg-slate-50"><span className="flex items-start justify-between gap-2"><strong className="text-xs">{region.properties.name}</strong><b className="text-[11px] text-blue-700">{region.properties.truck_count} truck(s)</b></span><span className="mt-1.5 block text-[11px] text-slate-500">{region.properties.log_count} telemetry logs · {region.properties.traffic.jammed} jammed / {region.properties.traffic.slow} moderate / {region.properties.traffic.free} free</span></button>)}</>}
         </div>
       </aside>
 
       <section className="pointer-events-none fixed bottom-5 right-5 z-[900] hidden w-44 rounded-xl border border-slate-200 bg-white/95 p-3 text-[11px] font-semibold leading-6 text-slate-500 shadow-lg backdrop-blur sm:block">
         <strong className="block text-slate-800">Traffic & activity</strong>
-        <span className="flex items-center"><i className="mr-2 h-2 w-2 rounded-full bg-red-500" />Red · heavy jam</span><span className="flex items-center"><i className="mr-2 h-2 w-2 rounded-full bg-yellow-400" />Yellow · moderate</span><span className="flex items-center"><i className="mr-2 h-2 w-2 rounded-full bg-blue-600" />Blue · free flow</span><hr className="my-2 border-slate-200" /><p className="leading-4">Province shading combines current trucks and accepted IoT logs.</p>
+        <span className="flex items-center"><i className="mr-2 h-2 w-2 rounded-full bg-red-500" />Red · heavy jam</span><span className="flex items-center"><i className="mr-2 h-2 w-2 rounded-full bg-yellow-400" />Yellow · moderate</span><span className="flex items-center"><i className="mr-2 h-2 w-2 rounded-full bg-blue-600" />Blue · free flow</span><hr className="my-2 border-slate-200" /><p className="leading-4">Circular activity zones combine current trucks and telemetry logs. Zoom in for individual trucks.</p>
       </section>
 
       {selectedPlan && <section className="fixed bottom-5 left-5 z-[900] w-[min(390px,calc(100vw-40px))] rounded-xl border border-slate-200 bg-white/95 p-4 shadow-xl shadow-slate-900/15 backdrop-blur">
