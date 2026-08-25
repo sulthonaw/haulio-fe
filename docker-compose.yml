@@ -1,53 +1,109 @@
-version: '3.8'
+name: haulio-local-demo
 
+# Run this file from compfest-aic-2026-fe. The three repository directories
+# must remain siblings as they are in the hackathon workspace.
 services:
-  # Development Service Environment
-  haulio-fe-dev:
-    container_name: haulio-fe-dev
+  ds:
+    build:
+      context: ../compfest-aic-2026-ds/real_policy/submission
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8088
+    ports:
+      - "127.0.0.1:8088:8088"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    mem_limit: 4g
+    cpus: 2.0
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:8088/health', timeout=3))['status']=='ready'"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: haulio_demo
+    volumes:
+      - postgres_demo_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d haulio_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ../haulio-be/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_demo_data:/mosquitto/data
+
+  be:
+    build:
+      context: ../haulio-be
+      target: runner
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3001
+      CORS_ORIGIN: http://127.0.0.1:3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: haulio_demo
+      DB_SYNCHRONIZE: "true"
+      DS_API_URL: http://ds:8088/
+      DS_IOT_SHARED_SECRET: ""
+      MQTT_ENABLED: "false"
+      MQTT_URL: mqtt://mosquitto:1883
+      MQTT_TOPIC_PREFIX: haulio/v1/telemetry
+      MQTT_CLIENT_ID: haulio-local-demo
+      IOT_DEVICE_MAPPINGS: "[]"
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      ds:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
+  fe:
     build:
       context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env.development
     environment:
-      - NODE_ENV=development
-    restart: unless-stopped
-
-  # Staging Service Environment
-  haulio-fe-staging:
-    container_name: haulio-fe-staging
-    build:
-      context: .
-      dockerfile: Dockerfile
+      NODE_ENV: production
+      BACKEND_URL: http://be:3001
     ports:
-      - "3001:3000"
-    env_file:
-      - .env.staging
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      be:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
 
-  # Production Service Environment
-  haulio-fe-prod:
-    container_name: haulio-fe-prod
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3002:3000"
-    env_file:
-      - .env.production
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
-
-  # Backend Upstream service (compfest-aic-2026-be mock service container)
-  # Un-comment this block if running local backend in Docker container
-  # compfest-aic-2026-be:
-  #   container_name: compfest-aic-2026-be
-  #   image: compfest-aic-2026-be:latest
-  #   ports:
-  #     - "8080:8080"
-  #   restart: unless-stopped
+volumes:
+  postgres_demo_data:
+  mosquitto_demo_data:

@@ -8,20 +8,9 @@ Follow these instructions to configure and run the application locally or via Do
 
 The application communicates with the backend operations service via the `BACKEND_URL` environment variable. Ensure the correct environment configurations are set before running:
 
-- **Local Development** (`.env.development`):
+- **Local Development** (`.env.local`):
   ```env
-  BACKEND_URL=http://localhost:8080
-  PORT=3000
-  ```
-- **Staging environment** (`.env.staging`):
-  ```env
-  BACKEND_URL=https://staging-api.haulio.id
-  PORT=3000
-  ```
-- **Production environment** (`.env.production`):
-  ```env
-  BACKEND_URL=https://api.haulio.id
-  PORT=3000
+  BACKEND_URL=http://127.0.0.1:3001
   ```
 
 ---
@@ -49,23 +38,41 @@ npm start
 
 ## 🐳 Running with Docker
 
-### 1. Build Production Container Image
+The Compose file in this repository launches the complete local-demo stack:
+the Next.js frontend, NestJS backend, frozen DS policy, PostgreSQL, and the
+loopback-only MQTT broker. The sibling repositories must remain next to this
+directory.
+
 ```bash
-docker build -t haulio-fe:latest .
+docker compose up --build -d
+docker compose ps
 ```
 
-### 2. Run with Docker Compose
-We support running different profile configurations through docker-compose services:
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The services are exposed
+only on loopback:
 
-- **Run Development Profile** (runs on port `3000`):
-  ```bash
-  docker compose up haulio-fe-dev
-  ```
-- **Run Staging Profile** (runs on port `3001`):
-  ```bash
-  docker compose up haulio-fe-staging
-  ```
-- **Run Production Profile** (runs on port `3002`):
-  ```bash
-  docker compose up haulio-fe-prod
-  ```
+| Service | URL | Purpose |
+| --- | --- | --- |
+| FE | `http://127.0.0.1:3000` | Next.js application |
+| BE | `http://127.0.0.1:3001/api` | NestJS and telemetry persistence |
+| DS | `http://127.0.0.1:8088/health` | Frozen real-data policy |
+
+Check the container path without revealing any credentials:
+
+```bash
+curl --fail http://127.0.0.1:8088/health
+curl --fail http://127.0.0.1:3001/api/v1/health
+curl --fail http://127.0.0.1:3000/
+```
+
+The teammate's DS release intentionally exposes immutable `/infer/*` policy
+endpoints, while the map UI still expects the earlier operations-map contract
+(`/fleet`, `/regions`, `/recommendations`). All three containers run together,
+but adapting that map contract to the new real-policy API is a separate product
+integration; this Compose setup does not fabricate a fleet response.
+
+Stop the local demo with:
+
+```bash
+docker compose down
+```
