@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/haulio-team.png" alt="Haulio — AI Autonomous Backhaul Optimizer, IoT Songgoriti team" width="900" />
+</p>
+
 # Haulio - Running Instructions
 
 Follow these instructions to configure and run the application locally or via Docker.
