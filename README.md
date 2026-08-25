@@ -61,7 +61,7 @@ curl --fail http://127.0.0.1:3001/api/v1/health
 docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U postgres -d haulio_demo < scripts/seed-demo-data.sql
 
 # 4. FE — dispatcher dashboard
-cd ../compfest-aic-2026-fe
+cd ../haulio-fe
 COMPOSE_IGNORE_ORPHANS=1 docker compose up --build -d
 curl --fail http://127.0.0.1:3000/
 ```
