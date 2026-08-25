@@ -36,17 +36,27 @@ npm start
 
 ---
 
-## 🐳 Running with Docker
+## 🐳 Running the local demo with Docker
 
-The Compose file in this repository launches the complete local-demo stack:
-the Next.js frontend, NestJS backend, frozen DS policy, PostgreSQL, and the
-loopback-only MQTT broker. The sibling repositories must remain next to this
-directory.
+Each repository owns one Compose command. They share the `haulio-local-demo`
+Docker network, so the backend resolves the DS as `http://ds:8088/` and the
+frontend resolves the backend as `http://be:3001`. Start them in this order:
 
 ```bash
-docker compose up --build -d
-docker compose ps
+# DS — compfest-aic-2026-ds/real_policy/submission
+COMPOSE_IGNORE_ORPHANS=1 docker compose up --build -d
+
+# BE — haulio-be
+COMPOSE_IGNORE_ORPHANS=1 docker compose up --build -d
+
+# FE — compfest-aic-2026-fe
+COMPOSE_IGNORE_ORPHANS=1 docker compose up --build -d
 ```
+
+Each command starts only the service(s) owned by that repository. The DS must
+be running before the BE, and the BE must be running before requests through
+the FE API proxy can succeed. `COMPOSE_IGNORE_ORPHANS=1` prevents Compose from
+mistaking the services owned by the other two repositories for stale containers.
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The services are exposed
 only on loopback:
@@ -71,8 +81,4 @@ endpoints, while the map UI still expects the earlier operations-map contract
 but adapting that map contract to the new real-policy API is a separate product
 integration; this Compose setup does not fabricate a fleet response.
 
-Stop the local demo with:
-
-```bash
-docker compose down
-```
+To stop a component, run `docker compose down` from that component's repository.
